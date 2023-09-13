@@ -6,12 +6,10 @@ import psycopg2
 
 conn = psycopg2.connect("dbname=framedata user=postgres password=perfect")
 cur = conn.cursor()
-sql_tables = """DROP TABLE MOVELIST;
-                DROP TABLE CHARACTERS;
-                CREATE TABLE CHARACTERS(
+sql_tables = """CREATE TABLE IF NOT EXISTS CHARACTERS(
                     CHARACTER_NAME VARCHAR(50) PRIMARY KEY
                 );
-                CREATE TABLE MOVELIST(
+                CREATE TABLE IF NOT EXISTS MOVELIST(
                     IDMOVE SERIAL PRIMARY KEY,
                     MOVE_NAME VARCHAR(255),
                     STARTUP VARCHAR(255),
