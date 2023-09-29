@@ -1,15 +1,16 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from chromedriver_py import binary_path
+import sqlite3
 import os.path
-import psycopg2
 
-conn = psycopg2.connect("dbname=framedata user=postgres password=perfect")
+conn = sqlite3.connect("framedata.db")
 cur = conn.cursor()
-sql_tables = """CREATE TABLE IF NOT EXISTS CHARACTERS(
+sql_table1 = """CREATE TABLE IF NOT EXISTS CHARACTERS(
                     CHARACTER_NAME VARCHAR(50) PRIMARY KEY
-                );
-                CREATE TABLE IF NOT EXISTS MOVELIST(
-                    IDMOVE SERIAL PRIMARY KEY,
+                );"""
+sql_table2 = """CREATE TABLE IF NOT EXISTS MOVELIST(
+                    IDMOVE INTEGER PRIMARY KEY,
                     MOVE_NAME VARCHAR(255),
                     STARTUP VARCHAR(255),
                     ACTIVE VARCHAR(255),
@@ -28,14 +29,16 @@ sql_tables = """CREATE TABLE IF NOT EXISTS CHARACTERS(
                     CHARACTER VARCHAR(255),
                     FOREIGN KEY(CHARACTER) REFERENCES CHARACTERS(CHARACTER_NAME)
                 );"""
-cur.execute(sql_tables)
-sql1 = """insert into characters(character_name) values(%s);"""
+cur.execute(sql_table1)
+cur.execute(sql_table2)
+sql1 = """insert into characters(character_name) values(?);"""
 sql2 = """insert into movelist(move_name, startup, active, recovery_frames, oh, ob, cancel, damage,
                                scaling, drive_increase, drive_decrease, drive_decrease_pc, sa_increase, 
                                high_low, misc, character) 
-                               values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+                               values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"""
 
-driver = webdriver.Edge()
+svc = webdriver.ChromeService(executable_path=binary_path)
+driver = webdriver.Chrome(service=svc)
 driver.get(f"https://www.streetfighter.com/6/character/")
 characters_as = driver.find_elements(By.CSS_SELECTOR, ".select_character__select__list__bgBGl > ul > li > a")
 characters = {}
